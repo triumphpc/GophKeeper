@@ -6,4 +6,6 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
-/*
+/GophKeeper.iml
+/modules.xml
+/vcs.xml
