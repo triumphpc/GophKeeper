@@ -1,5 +1,5 @@
-// Package service implement User entity
-package service
+// Package user implement project services
+package user
 
 import (
 	"fmt"
@@ -8,12 +8,14 @@ import (
 
 // User contains user's information
 type User struct {
+	Id             int
 	Username       string
 	HashedPassword string
+	Role           string
 }
 
-// NewUser returns a new user
-func NewUser(username string, password string) (*User, error) {
+// New returns a new user
+func New(username string, password string, role string) (*User, error) {
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 
 	if err != nil {
@@ -23,6 +25,7 @@ func NewUser(username string, password string) (*User, error) {
 	user := &User{
 		Username:       username,
 		HashedPassword: string(hashedPassword),
+		Role:           role,
 	}
 
 	return user, nil
@@ -31,5 +34,6 @@ func NewUser(username string, password string) (*User, error) {
 // IsCorrectPassword checks if the provided password is correct or not
 func (user *User) IsCorrectPassword(password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.HashedPassword), []byte(password))
+
 	return err == nil
 }

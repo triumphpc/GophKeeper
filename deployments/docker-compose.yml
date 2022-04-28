@@ -7,17 +7,16 @@ services:
     build:
       context: ..
       dockerfile: build/docker/go_service.dockerfile
+    restart: on-failure # waiting postgresql
     ports:
-      - "8080:8080"
+      - "3200:3200"
+    volumes:
+      - ../bin:/bin
     depends_on:
       - goph_keeper_postgres_service
-    environment:
-      - DATABASE_DSN=postgres://postgres:qwerty@goph_keeper_service:5432/postgres?sslmode=disable
     networks:
       - goph-keeper-network
 
-   docker-compose up -d --build goose_exec_service - rebuild goose container
-   docker-compose run --rm goose_exec_service create link_storage sql - create new migrations
   goph_keeper_goose_service:
     container_name: goose_exec_service
     build:

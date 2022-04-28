@@ -15,6 +15,6 @@ RUN echo $PATH
 
 # build go app
 RUN go mod download
-RUN go build -o main cmd/gophkeeper/server/main.go
+RUN go build -o bin/server/main cmd/gophkeeper/server/main.go
 
-CMD ["./main"]
+CMD ["./bin/server/main"]

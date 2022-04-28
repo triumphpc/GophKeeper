@@ -30,6 +30,7 @@ type JSONConfig struct {
 
 // ConfigPath Config project path
 const ConfigPath = "/configs/env.json"
+const userDataServicePath = "/api.UserDataService/"
 
 var instance *Config
 
@@ -70,4 +71,11 @@ func init() {
 // Instance return singleton
 func Instance() *Config {
 	return instance
+}
+
+// AccessibleRoles determine access to gRPC handler for different roles
+func (c *Config) AccessibleRoles() map[string][]string {
+	return map[string][]string{
+		userDataServicePath + "SaveText": {"user"},
+	}
 }
