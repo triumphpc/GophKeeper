@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  # server side
+  goph_keeper_service:
+    container_name: goph_keeper_service
+    build:
+      context: ..
+      dockerfile: build/docker/go_service.dockerfile
+    restart: on-failure # waiting postgresql
+    ports:
+      - "3200:3200"
+    volumes:
+      - ../bin:/bin
+    depends_on:
+      - goph_keeper_postgres_service
+    networks:
+      - goph-keeper-network
+
+  goph_keeper_goose_service:
+    container_name: goose_exec_service
+    build:
+      context: ..
+      dockerfile: build/docker/goose_service_exec.dockerfile
+    depends_on:
+      - goph_keeper_postgres_service
+    environment:
+      - DBHOST=goph_keeper_postgres_service
+      - DBNAME=postgres
+      - DBUSER=postgres
+      - DBPASSWORD=qwerty
+      - DBSSL=disable
+    volumes:
+      - ../migrations:/migrations
+    entrypoint: [ "bash", "entrypoint_exec.sh" ]
+    networks:
+      - goph-keeper-network
+
+  goph_keeper_postgres_service:
+    restart: always
+    image: postgres:latest
+    container_name: goph_keeper_postgres_service
+    environment:
+      - POSTGRES_PASSWORD=qwerty
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - goph-keeper-network
+
+networks:
+  goph-keeper-network:
+    driver: bridge
