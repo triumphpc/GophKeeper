@@ -3,9 +3,6 @@ package pg
 import (
 	"context"
 	"database/sql"
-	"errors"
-	"github.com/jackc/pgerrcode"
-	"github.com/lib/pq"
 	_ "github.com/lib/pq"
 	"github.com/pressly/goose/v3"
 	"github.com/triumphpc/GophKeeper/internal/app/pkg/storage"
@@ -55,15 +52,11 @@ func (s *Pg) CreateUser(u *user.User) error {
 		"INSERT INTO users (id, login, password, role) VALUES (DEFAULT, $1, $2, $3) RETURNING id",
 		u.Username,
 		u.HashedPassword,
+		u.Role,
 	).Scan(&u.Id)
 
 	if err != nil {
-		if err, ok := err.(*pq.Error); ok {
-			if err.Code == pgerrcode.UniqueViolation {
-				return errors.New("login already exist")
-			}
-			return err
-		}
+		return err
 	}
 
 	return nil

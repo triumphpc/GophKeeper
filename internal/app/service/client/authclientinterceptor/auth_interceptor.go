@@ -15,6 +15,7 @@ type AuthInterceptor struct {
 	authClient  *authclient.AuthClient
 	authMethods map[string]bool
 	accessToken string
+	isReg       bool
 }
 
 // New returns a new auth interceptor
@@ -23,10 +24,12 @@ func New(
 	authClient *authclient.AuthClient,
 	authMethods map[string]bool,
 	refreshDuration time.Duration,
+	isRegistration bool,
 ) (*AuthInterceptor, error) {
 	interceptor := &AuthInterceptor{
 		authClient:  authClient,
 		authMethods: authMethods,
+		isReg:       isRegistration,
 	}
 
 	err := interceptor.scheduleRefreshToken(ctx, refreshDuration)
@@ -66,7 +69,14 @@ func (interceptor *AuthInterceptor) scheduleRefreshToken(ctx context.Context, re
 
 // refreshToken for user
 func (interceptor *AuthInterceptor) refreshToken() error {
-	accessToken, err := interceptor.authClient.Login()
+	var accessToken string
+	var err error
+
+	if interceptor.isReg {
+		accessToken, err = interceptor.authClient.Registration()
+	} else {
+		accessToken, err = interceptor.authClient.Login()
+	}
 	if err != nil {
 		return err
 	}
